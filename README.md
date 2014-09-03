@@ -1,6 +1,6 @@
 # Production Setup
 
-Before you begin, you'll need to collect a number of private keys and passphrases. Ask @ycombinator for them.
+Before you begin, you'll need to collect the following (ask @ycombinator):
 
  * `~/.ssh/drg.pem`
 
