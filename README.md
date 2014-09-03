@@ -3,6 +3,7 @@
 Before you begin, you'll need to collect the following (ask @ycombinator):
 
  * `~/.ssh/drg.pem`
+ * The `ansible-vault` password.
 
 1. Download and install [Ansible](http://docs.ansible.com/intro_installation.html#installing-the-control-machine).
    * On Mac OSX machines with [Homebrew](http://brew.sh/) installed, you can simply run: `$ brew install ansible`
@@ -37,10 +38,5 @@ Before you begin, you'll need to collect the following (ask @ycombinator):
 6. Run the Ansible playbook to set up the production environment within a region.
 
   ```bash
-  $ RAX_REGION=DFW \
-    RACK_TO_DB_HOST=<REPLACE WITH RACK.TO DB HOSTNAME:PORT> \ 
-    RACK_TO_DB_USER=<REPLACE WITH RACK.TO DB USERNAME> \
-    RACK_TO_DB_PASS=<REPLACE WITH RACK.TO DB PASSWORD> \
-    RACK_TO_DB_NAME=<REPLACE WITH RACK.TO DB NAME> \
-    ansible-playbook -i inventory/ site.yml
+  $ RAX_REGION=DFW ansible-playbook --ask-vault-pass -i inventory/ site.yml
   ```

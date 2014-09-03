@@ -1,0 +1,39 @@
+---
+- name: Provision rack.to setup
+  hosts: local
+  connection: local
+  tasks:
+
+  - name: Provision web server
+    rax:
+      credentials: ~/.rackspace_cloud_credentials
+      name: "rack.to_web_"
+      flavor: performance1-1
+      image: ubuntu-1404-lts-trusty-tahr
+      networks:
+        - public
+        - private
+      region: "{{ lookup('env', 'RAX_REGION') | upper }}"
+      state: present
+      count: 1
+      exact_count: yes
+      group: rack_to_webservers
+      wait: yes
+      key_name: drg
+    register: rax_web
+
+  - name: Add web servers to rack_to_webservers host group
+    add_host:
+      hostname: "{{ item.name }}"
+      ansible_ssh_host: "{{ item.rax_accessipv4 }}"
+      groupname: rack_to_webservers
+    with_items: rax_web.success
+    when: rax_web.action == 'create'
+
+- name: Configure rack.to webserver
+  hosts: rack_to_webservers
+  remote_user: root
+  vars_files:
+  - vars.secret.yml
+  roles:
+  - web

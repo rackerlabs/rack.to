@@ -1,15 +1,19 @@
 ---
 - name: Turn off the ufw firewall (to allow software installation)
-  ufw: state=disabled
+  ufw: state=reset
 
 - name: Install Apache and PHP + git (for installing yourls)
   apt: name={{ item }} state=present update_cache=yes
   with_items:
   - libapache2-mod-php5
+  - php5-mysql
   - git
 
 - name: Install yourls
   git: repo=https://github.com/YOURLS/YOURLS.git dest=/var/www/rack.to
+
+- name: Turn on firewall logging
+  ufw: logging=on
 
 - name: Turn on the ufw firewall
   ufw: state=enabled
@@ -18,17 +22,27 @@
   template: src=var/www/rack.to/user/config.php.j2 dest=/var/www/rack.to/user/config.php
 
 - name: Copy Apache config file for rack.to
-  copy: src=etc/apache2/conf-available/rack.to.conf dest=/etc/apache2/conf-available/rack.to.conf
-  notify: Reload Apache Config
+  copy: src=etc/apache2/sites-available/rack.to.conf dest=/etc/apache2/sites-available/rack.to.conf
 
-- name: Turn on firewall logging
-  ufw: logging=on
+- name: Enable Apache config file for rack.to
+  file: src=../sites-available/rack.to.conf dest=/etc/apache2/sites-enabled/rack.to.conf state=link force=yes
+  notify: Reload Apache Config
 
 - name: Allow incoming TCP traffic to ports 80 and 22
   ufw: rule=allow port={{ item }} proto=tcp direction=in
   with_items:
   - 80
   - 22
+
+- name: Allow outgoing TCP traffic to port 3306
+  ufw: rule=allow port={{ item }} proto=tcp direction=out
+  with_items:
+  - 3306
+
+- name: Allow outgoing UDP traffic to port 53
+  ufw: rule=allow port={{ item }} proto=udp direction=out
+  with_items:
+  - 53
 
 - name: Deny everything else
   ufw: policy=deny direction={{ item }}
