@@ -1,0 +1,21 @@
+---
+#- name: Install Apache and PHP
+
+- name: Turn on firewall logging
+  ufw: logging=on
+
+- name: Allow incoming TCP traffic to ports 80 and 22
+  ufw: rule=allow port={{ item }} proto=tcp direction=in
+  with_items:
+  - 80
+  - 22
+
+- name: Deny everything else
+  ufw: policy=deny direction={{ item }}
+  with_items:
+  - incoming
+  - outgoing
+
+- name: Turn on the ufw firewall
+  ufw: state=enabled
+
