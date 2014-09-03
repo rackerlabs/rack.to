@@ -37,5 +37,10 @@ Before you begin, you'll need to collect the following (ask @ycombinator):
 6. Run the Ansible playbook to set up the production environment within a region.
 
   ```bash
-  $ RAX_REGION=DFW ansible-playbook -i inventory/ site.yml
+  $ RAX_REGION=DFW \
+    RACK_TO_DB_HOST=<REPLACE WITH RACK.TO DB HOSTNAME:PORT> \ 
+    RACK_TO_DB_USER=<REPLACE WITH RACK.TO DB USERNAME> \
+    RACK_TO_DB_PASS=<REPLACE WITH RACK.TO DB PASSWORD> \
+    RACK_TO_DB_NAME=<REPLACE WITH RACK.TO DB NAME> \
+    ansible-playbook -i inventory/ site.yml
   ```

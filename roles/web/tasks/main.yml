@@ -1,5 +1,25 @@
 ---
-#- name: Install Apache and PHP
+- name: Turn off the ufw firewall (to allow software installation)
+  ufw: state=disabled
+
+- name: Install Apache and PHP + git (for installing yourls)
+  apt: name={{ item }} state=present update_cache=yes
+  with_items:
+  - libapache2-mod-php5
+  - git
+
+- name: Install yourls
+  git: repo=https://github.com/YOURLS/YOURLS.git dest=/var/www/rack.to
+
+- name: Turn on the ufw firewall
+  ufw: state=enabled
+
+- name: Copy yourls config file
+  template: src=var/www/rack.to/user/config.php.j2 dest=/var/www/rack.to/user/config.php
+
+- name: Copy Apache config file for rack.to
+  copy: src=etc/apache2/conf-available/rack.to.conf dest=/etc/apache2/conf-available/rack.to.conf
+  notify: Reload Apache Config
 
 - name: Turn on firewall logging
   ufw: logging=on
@@ -15,7 +35,3 @@
   with_items:
   - incoming
   - outgoing
-
-- name: Turn on the ufw firewall
-  ufw: state=enabled
-
